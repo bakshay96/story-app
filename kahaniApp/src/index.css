@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-background dark:bg-darkBackground text-black dark:text-white;
+}
+
+textarea {
+  @apply border p-3 rounded bg-gray-100 dark:bg-gray-700 dark:text-white;
+}
