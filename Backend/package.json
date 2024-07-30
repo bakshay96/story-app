@@ -2,10 +2,11 @@
   "name": "story-backend",
   "version": "1.0.0",
   "description": "Collaborative story creator web app",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "test",
-    "server": "nodemon index.js"
+    "server": "nodemon /app.js",
+    "build":"npm i"
   },
   "keywords": [
     "node",
