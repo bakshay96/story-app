@@ -22,6 +22,7 @@ const Navbar = () => {
       </Link>
       <div className="flex items-center">
         <Link to="/stories" className="mr-4 text-primary dark:text-secondary hover:underline">Stories</Link>
+        <Link to="/upload" className="mr-4 text-primary dark:text-secondary hover:underline">Upload File</Link>
         {user ? (
           <>
             <span className="mr-4 text-primary dark:text-secondary">Welcome, {user.name}</span>

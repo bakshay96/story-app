@@ -9,6 +9,8 @@ import Login from '../Components/Login';
 import Register from '../Components/Register';
 import Footer from '../Components/Footer';
 import LandingPage from '../Components/LandingPage';
+import ImageUpload from '../Components/ImageUpload';
+
 
 export const MainRoutes = () => {
   
@@ -23,6 +25,8 @@ export const MainRoutes = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/landing" element={<LandingPage />} />
+          <Route path="/upload" element={<ImageUpload />} />
+        
        
         </Routes>
       </main>
