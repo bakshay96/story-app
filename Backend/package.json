@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "test",
-    "server": "nodemon /app.js",
-    "build":"npm i"
+    "server": "nodemon /app.js"
+   
   },
   "keywords": [
     "node",
