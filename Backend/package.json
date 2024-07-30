@@ -4,8 +4,10 @@
   "description": "Collaborative story creator web app",
   "main": "app.js",
   "scripts": {
-    "test": "test",
-    "server": "nodemon /app.js"
+
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "test"
    
   },
   "keywords": [
