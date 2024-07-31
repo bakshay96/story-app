@@ -1,23 +1,23 @@
 // middlewares/authMiddleware.js
 const jwt = require('jsonwebtoken');
-const { statusMiddleware } = require('./statusMiddleware');
+const { UserModel } = require('../User/user.models');
+require("dotenv").config();
 
 
-const authMiddleware = (req, res, next) => {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+const authMiddleware = async (req, res, next) => {
+    const token = req.header('Authorization')?.split(' ')[1];
+    console.log("token", token);
     if (!token) {
-        return statusMiddleware(401, 'Access denied. No token provided.')(req, res, next);
+        return res.status(401).json({ message: 'No token, authorization denied' });
     }
-
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
+        console.log("decoded",decoded)
+        req.user = await UserModel.findById(decoded.id).select('-password');
         next();
     } catch (error) {
-        return statusMiddleware(401, 'Invalid token.')(req, res, next);
+        res.status(401).json({ message: 'Token is not valid' });
     }
 };
 
-module.exports = {
-    authMiddleware
-}
+module.exports = {authMiddleware};

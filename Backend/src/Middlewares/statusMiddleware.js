@@ -1,10 +1,10 @@
 // middlewares/statusMiddleware.js
-const statusMiddleware = (statusCode, message) => {
-    return (req, res, next) => {
-        res.status(statusCode).json({ status: statusCode, message: message });
+
+const statusMiddleware = (req, res, next) => {
+    res.statusMessage = (statusCode, message) => {
+        res.status(statusCode).json({ message });
     };
+    next();
 };
 
-module.exports = {
-    statusMiddleware
-}
+module.exports = {statusMiddleware}

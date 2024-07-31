@@ -1,33 +1,81 @@
+// controllers/authController.js
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const {statusMiddleware} = require('../Middlewares/statusMiddleware');
 const { UserModel } = require('./user.models');
 
-exports.register = async (req, res, next) => {
-    const { username, password } = req.body;
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await UserModel.create({ username, password: hashedPassword });
-        res.status(201).json(user);
-    } catch (error) {
-        return statusMiddleware(500, 'Error registering user')(req, res, next);
-    }
-};
+const register = async (req, res) => {
+    const { username, email, password } = req.body;
 
-exports.login = async (req, res, next) => {
-    const { username, password } = req.body;
     try {
-        const user = await UserModel.findOne({ username });
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return statusMiddleware(401, 'Invalid credentials')(req, res, next);
+        let user = await UserModel.findOne({ email });
+
+        if (user) {
+            return res.fail('User already exists', 400);
         }
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.json({ token });
-    } catch (error) {
-        return statusMiddleware(500, 'Error logging in')(req, res, next);
+
+        user = new UserModel({ username, email, password });
+
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(password, salt);
+
+        await user.save();
+
+        const payload = { id: user.id };
+
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' },
+            (err, token) => {
+                if (err) throw err;
+                res.status(201).success({ token }, 'User registered successfully');
+            }
+        );
+    } catch (err) {
+        next(err);
     }
 };
 
-exports.getCurrentUser = (req, res) => {
-    res.json(req.user);
+const login = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            return res.fail('Invalid credentials', 400);
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.fail('Invalid credentials', 400);
+        }
+
+        const payload = { id: user.id };
+
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' },
+            (err, token) => {
+                if (err) throw err;
+                
+                res.success({ token }, 'User logged in successfully');
+            }
+        );
+    } catch (err) {
+        next(err);
+    }
 };
+
+const getCurrentUser = async (req, res) => {
+    try {
+        const user = await UserModel.findById(req.user.id).select('-password');
+        res.success(user, 'User data fetched successfully');
+    } catch (err) {
+        next(err);
+    }
+};
+
+module.exports = { register, login, getCurrentUser };
