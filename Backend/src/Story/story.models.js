@@ -4,14 +4,18 @@ const ContributionSchema = new mongoose.Schema({
     text: { type: String, required: true },
     author: { type: String, required: true },
     authorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+},{
+    timestamps:true
 });
 
 const StorySchema = new mongoose.Schema({
-    title: { type: String, required: true },
+    title: { type: String, required: true, unique:true },
     content: [ContributionSchema],
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     contributors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     maxContributions: { type: Number, default: 10 }
+},{
+    timestamps:true
 });
 
 StorySchema.methods.canContribute = function (userId) {

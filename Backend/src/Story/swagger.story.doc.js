@@ -2,26 +2,64 @@
  * @swagger
  * components:
  *   schemas:
+ *     Contribution:
+ *       type: object
+ *       properties:
+ *         text:
+ *           type: string
+ *           example: "This is a contribution text."
+ *         author:
+ *           type: string
+ *           example: "JohnDoe"
+ *         authorId:
+ *           type: string
+ *           example: "605c72ef1f1a2c6f37d6c3b5"
+ *       required:
+ *         - text
+ *         - author
+ *         - authorId
  *     Story:
  *       type: object
- *       required:
- *         - title
- *         - initialSentence
  *       properties:
  *         title:
  *           type: string
- *           description: The story title
- *         initialSentence:
+ *           example: "My First Story"
+ *         content:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Contribution'
+ *         createdBy:
  *           type: string
- *           description: The first sentence of the story
- *       example:
- *         title: My First Story
- *         initialSentence: This is the beginning of a great adventure.
+ *           example: "605c72ef1f1a2c6f37d6c3b5"
+ *         contributors:
+ *           type: array
+ *           items:
+ *             type: string
+ *             example: "605c72ef1f1a2c6f37d6c3b5"
+ *         maxContributions:
+ *           type: integer
+ *           example: 10
+ *       required:
+ *         - title
+ *         - content
+ *         - createdBy
+ *     ErrorResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: false
+ *         message:
+ *           type: string
+ *           example: "Error message"
+ *         data:
+ *           type: object
+ *           example: {}
  */
 
 /**
  * @swagger
- * /api/stories:
+ * /api/stories/create:
  *   post:
  *     summary: Create a new story
  *     tags: [Stories]
@@ -32,34 +70,65 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Story'
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "My First Story"
+ *               text:
+ *                 type: string
+ *                 example: "Once upon a time, there was a brave knight."
  *     responses:
  *       201:
  *         description: Story created successfully
- *       400:
- *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Story'
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized, token is missing or invalid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-
 
 /**
  * @swagger
  * /api/stories:
  *   get:
- *     summary: Get the list of stories
+ *     summary: Get a list of stories
  *     tags: [Stories]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: List of stories
+ *         description: Successfully fetched stories
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Story'
+ *       401:
+ *         description: Unauthorized, token is missing or invalid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-
 
 /**
  * @swagger
@@ -68,23 +137,41 @@
  *     summary: Get a specific story by ID
  *     tags: [Stories]
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the story
  *         schema:
  *           type: string
- *         required: true
- *         description: The story ID
+ *           example: "605c72ef1f1a2c6f37d6c3b5"
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Story data
+ *         description: Successfully fetched the story
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Story'
  *       404:
  *         description: Story not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         description: Unauthorized, token is missing or invalid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-
 
 /**
  * @swagger
@@ -92,15 +179,14 @@
  *   post:
  *     summary: Add a contribution to a story
  *     tags: [Stories]
- *     security:
- *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the story
  *         schema:
  *           type: string
- *         required: true
- *         description: The story ID
+ *           example: "605c72ef1f1a2c6f37d6c3b5"
  *     requestBody:
  *       required: true
  *       content:
@@ -108,18 +194,40 @@
  *           schema:
  *             type: object
  *             properties:
- *               contribution:
+ *               text:
  *                 type: string
- *                 description: The contribution text
- *             example:
- *               contribution: This is the next part of the story.
+ *                 example: "The knight fought bravely and won the battle."
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Contribution added successfully
- *       400:
- *         description: Bad request
- *       401:
- *         description: Unauthorized
+ *         description: Successfully added contribution
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Story'
+ *       403:
+ *         description: Forbidden, user cannot contribute
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Story not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         description: Unauthorized, token is missing or invalid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */

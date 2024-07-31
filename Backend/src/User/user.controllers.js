@@ -25,7 +25,7 @@ const register = async (req, res) => {
         jwt.sign(
             payload,
             process.env.JWT_SECRET,
-            { expiresIn: '1h' },
+            { expiresIn: '5h' },
             (err, token) => {
                 if (err) throw err;
                 res.status(201).success({ token }, 'User registered successfully');
@@ -57,7 +57,7 @@ const login = async (req, res) => {
         jwt.sign(
             payload,
             process.env.JWT_SECRET,
-            { expiresIn: '1h' },
+            { expiresIn: '5h' },
             (err, token) => {
                 if (err) throw err;
                 

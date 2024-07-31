@@ -8,6 +8,7 @@ const { responseHandler } = require("./src/Middlewares/reponseHandler");
 const { errorHandler } = require("./src/Middlewares/errorHandler");
 
 const cors=require("cors");
+
 require("dotenv").config();
 const port=process.env.PORT || 8080;
 
@@ -17,6 +18,7 @@ const app=express();
 app.use(cors({origin:"*"}));
 app.use(express.json());
 app.use(responseHandler);
+
 
 
 app.get("/",async (req,res)=>{

@@ -13,11 +13,11 @@ const swaggerDefinition = {
     servers: [
         {
             url: 'http://localhost:5050',
-            description: 'Development server-1',
+            description: 'Development local server-1',
         },
         {
             url:'https://story-app-waqr.onrender.com',
-            description:'Development server-2'
+            description:'Development remote server-2'
         }
     ],
     components: {
