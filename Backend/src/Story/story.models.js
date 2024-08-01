@@ -9,16 +9,17 @@ const ContributionSchema = new mongoose.Schema({
 });
 
 const StorySchema = new mongoose.Schema({
-    title: { type: String, required: true, unique:true },
+    title: { type: String, required: [true, "Story title required"], unique:[true, "Story title should be unique"] },
     content: [ContributionSchema],
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     contributors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    maxContributions: { type: Number, default: 10 }
+    maxContributions: { type: Number, default: 50 }
 },{
     timestamps:true
 });
 
 StorySchema.methods.canContribute = function (userId) {
+    console.log("user Id",userId);
     const contributionsByUser = this.content.filter(contribution => contribution.authorId.toString() === userId.toString()).length;
     return contributionsByUser === 0 && this.content.length < this.maxContributions;
 };
