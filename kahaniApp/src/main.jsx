@@ -7,16 +7,21 @@ import { ThemeProvider } from "./Context/ThemeContext.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./Context/AuthContext.jsx";
+import { Provider } from "react-redux";
+import { store } from "./Redux/store.js";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-	<React.StrictMode>
-		<ThemeProvider>
-			<BrowserRouter>
-				<AuthProvider>
-					<App />
-				</AuthProvider>
-				<ToastContainer />
-			</BrowserRouter>
-		</ThemeProvider>
-	</React.StrictMode>
+	
+		<Provider store={store}>
+			<ThemeProvider>
+				<BrowserRouter>
+					<AuthProvider>
+						<App />
+						<ToastContainer />
+					</AuthProvider>
+					<ToastContainer />
+				</BrowserRouter>
+			</ThemeProvider>
+		</Provider>
+	
 );

@@ -1,26 +1,36 @@
 import { useEffect, useState } from "react";
 import { FaUserAlt, FaLock } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { register } from "../Redux/Slices/authSlice";
+import { toast } from "react-toastify";
 
 
 const Register = () => {
-  
-  const [name, setName] = useState("");
+  const {token,user} =useSelector((state)=>state.auth)
+  const [username, setuserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
+  const dispatch=useDispatch();
+  const navigate=useNavigate();
+console.log(user,token)
+if(user)
+{
+   navigate("/")
+}
   const handleShowClick = () => setShowPassword(!showPassword);
-
-  
-  const navigate = useNavigate();
 
   const signupHandler = (e) => {
     e.preventDefault();
-    if (!name || !email || !password) {
-      alert("Please fill all the fields");
+    if (!username || !email || !password) {
+     
+      toast.info("Please fill all required fields");
     } else {
-      let userData = { name, email, password };
+      let userData = { username, email, password };
+      console.log(userData)
+      dispatch(register(userData))
+      
       
     }
   };
@@ -51,8 +61,8 @@ const Register = () => {
               <input
                 type="text"
                 placeholder="First Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={username}
+                onChange={(e) => setuserName(e.target.value)}
                 className="w-full py-2 px-4 focus:outline-none rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
             </div>

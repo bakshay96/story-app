@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchStories, updateExistingStory } from '../Redux/Slices/storySlice';
 
 const AddLineModal = ({ story, onClose }) => {
+  const {token,user} =useSelector((state)=>state.auth);
   const [newLine, setNewLine] = useState('');
+  const dispatch=useDispatch();
   const wordLimit = 280;
 
   const handleSubmit = async () => {
@@ -10,19 +14,27 @@ const AddLineModal = ({ story, onClose }) => {
       return;
     }
 
-    const updatedStory = {
-      ...story,
-      lines: [...story.lines, newLine],
-      lastEditBy: 'user-id', // Replace with actual user ID
-      lastEditAt: new Date().toISOString(),
-    };
+    // const updatedStory = {
+    //   ...story,
+    //   lines: [...story.lines, newLine],
+    //   lastEditBy: 'user-id', // Replace with actual user ID
+    //   lastEditAt: new Date().toISOString(),
+    // };
+    
+    const id=story._id;
+    dispatch(updateExistingStory({id,newLine,token}))
+    dispatch(fetchStories(token));
+
+
 
     try {
       await updateStory(updatedStory); // Assuming updateStory is an API utility for updating stories
+
       toast.success('Line added successfully!');
       onClose();
     } catch (error) {
       toast.error('Failed to add line');
+      
     }
   };
 

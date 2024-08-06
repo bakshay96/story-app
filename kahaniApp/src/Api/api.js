@@ -19,7 +19,7 @@ export const loginUser = async (email, password) => {
 };
 
 
-export const fetchStories = async () => {
+export const fetchStorie = async () => {
   try {
     const response = await fetch('/data/stories.json');
     if (!response.ok) {

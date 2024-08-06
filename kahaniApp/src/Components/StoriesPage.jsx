@@ -1,34 +1,35 @@
 import React, { useState, useEffect } from "react";
-import { fetchStories } from "../Api/api"; // Assuming you have an API utility for fetching stories
+import { fetchStorie } from "../Api/api"; // Assuming you have an API utility for fetching stories
 import StoryCard from "./StoryCard";
 import { toast } from "react-toastify";
 import SortingAndFiltering from "./SortingAndFiltering";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStories } from "../Redux/Slices/storySlice";
 
 const StoriesPage = () => {
-	const [stories, setStories] = useState([]);
+	const {stories,loading,error} = useSelector((state)=>state.story);
+	const { user,token } = useSelector((state) => state.auth);
+	
+	console.log("story page token and user",token,user)
+	console.log("story page",stories,loading,error)
+	const dispatch = useDispatch();
+	 let [storie] = useState([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [itemsPerPage] = useState(6);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [sortOrder, setSortOrder] = useState("latest");
   const [filter,setFilter]=useState("all")
-
-	useEffect(() => {
-		const getStories = async () => {
-			try {
-				const response = await fetchStories();
-				if (response.length === 0) {
-					toast.error("Failed to fetch stories");
-				}
-
-				setStories(response);
-			} catch (error) {
-				console.error("Failed to fetch stories:", error);
-				toast.error("Failed to fetch stories");
-			}
-		};
-
-		getStories();
-	}, []);
+console.log("current storie:",storie)
+storie=stories
+  useEffect(()=>{
+		dispatch(fetchStories(token))
+		if(stories.length>0)
+		{
+			storie=stories;
+		}
+		console.log("iffect storie",storie)
+  },[token,user])
+	
 
 	const handlePageChange = (pageNumber) => {
 		setCurrentPage(pageNumber);
@@ -76,10 +77,11 @@ const StoriesPage = () => {
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
-  const filteredStories = stories
+  console.log("filter story",storie)
+  const filteredStories = storie
     .filter((story) =>
       story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      story.creator.toLowerCase().includes(searchQuery.toLowerCase())
+      story.createdBy.username.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
       if (sortOrder === 'latest') {
@@ -90,8 +92,8 @@ const StoriesPage = () => {
     })
     .filter((story) => {
       if (filter === 'all') return true;
-      if (filter === 'byMe') return story.creator === 'CurrentUser'; // Replace with actual user check
-      if (filter === 'byOthers') return story.creator !== 'CurrentUser'; // Replace with actual user check
+      if (filter === 'byMe') return story.createdBy._id === user._id; // Replace with actual user check
+      if (filter === 'byOthers') return story.createdBy._id !== user._id; // Replace with actual user check
       return true;
     });
 

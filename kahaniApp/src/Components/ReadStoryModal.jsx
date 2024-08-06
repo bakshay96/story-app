@@ -1,10 +1,16 @@
 import React, { useState } from "react";
-import { format } from "date-fns";
+import { format, getDate } from "date-fns";
 import AddLineModal from "./AddLineModal";
+import { useDispatch, useSelector } from "react-redux";
+import { updateExistingStory } from "../Redux/Slices/storySlice";
+import { toast } from "react-toastify";
 const ReadStoryModal = ({ story, onClose }) => {
+	const {token} =useSelector((state)=>state.auth);
 	const [showAddLine, setShowAddLine] = useState(false);
 	const [newLine, setNewLine] = useState("");
 	const wordLimit = 280;
+	const dispatch=useDispatch();
+	console.log("story",story)
 
 	const handleAddLineClick = () => {
 		setShowAddLine(true);
@@ -12,22 +18,37 @@ const ReadStoryModal = ({ story, onClose }) => {
 
 	const handleSubmit = async () => {
 		if (newLine.length > wordLimit) {
+			
 			toast.error("Line exceeds the word limit");
 			return;
 		}
 
-		const updatedStory = {
-			...story,
-			lines: [...story.lines, newLine],
-			lastEditBy: "user-id", // Replace with actual user ID
-			lastEditAt: new Date().toISOString(),
-		};
+		// const updatedStory = {
+		// 	...story,
+		// 	lines: [...story.lines, newLine],
+		// 	lastEditBy: "user-id", // Replace with actual user ID
+		// 	lastEditAt: new Date().toISOString(),
+		// };
 
 		try {
-			await updateStory(updatedStory); // Assuming updateStory is an API utility for updating stories
-			toast.success("Line added successfully!");
+			//await updateStory(updatedStory); // Assuming updateStory is an API utility for updating storie
+			dispatch(updateExistingStory({id:story._id,text:newLine,token})).then((res)=>{
+				console.log("update:,",res)
+				if(res.payload.satus=="error")
+				{
+					toast.error(res.payload.message);
+				}
+				{
+
+					toast.success(res.payload.message);
+					dispatch(fetchStories(token));
+				}
+			});
+
 			onClose();
+			
 		} catch (error) {
+			console.log(error)
 			toast.error("Failed to add line");
 		}
 	};
@@ -49,7 +70,7 @@ const ReadStoryModal = ({ story, onClose }) => {
 						</p>
 					))}
 					<div className="text-sm  dark:text-gray-600 mt-4">
-						Last edited at: {format(new Date(story.lastEditedAt), "PPpp")}
+						Last edited at: {`${(new Date(story.updatedAt))}`.split("GMT+0530 (India Standard Time)")}
 					</div>
 				</div>
 				<div className="flex justify-end">

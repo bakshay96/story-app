@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { saveStory } from '../Api/api'; // Assuming you have an API utility for saving stories
+import { useDispatch, useSelector } from "react-redux";
+import { createNewStory } from '../Redux/Slices/storySlice';
+
 
 const CreateStoryModal = ({ onClose }) => {
+  const {token}=useSelector((state)=>state.auth)
   const [storyTitle, setStoryTitle] = useState('');
   const [storyLine, setStoryLine] = useState('');
   const wordLimit = 280;
+  const dispatch=useDispatch();
+
 
   const handleSubmit = async () => {
     if (storyLine.length > wordLimit) {
@@ -15,13 +20,14 @@ const CreateStoryModal = ({ onClose }) => {
 
     const storyData = {
       title: storyTitle,
-      firstLine: storyLine,
-      createdBy: 'user-id', // Replace with actual user ID
-      createdAt: new Date().toISOString(),
+      text: storyLine,
+      
+      
     };
 
     try {
-      await saveStory(storyData);
+      console.log(storyData)
+      dispatch(createNewStory({storyData,token}))
       toast.success('Story created successfully!');
       onClose();
     } catch (error) {

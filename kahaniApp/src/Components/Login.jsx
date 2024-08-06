@@ -1,22 +1,35 @@
 import { useEffect, useState } from "react";
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { existingUser, login } from "../Redux/Slices/authSlice";
 
 
 const Login = () => {
-	const token=useState(null)
+	const {token,user} =useSelector((state)=>state.auth)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
- 
+ console.log(token,user)
   const navigate = useNavigate();
   const location = useLocation();
-
+  const dispatch=useDispatch();
+  if(token && !user)
+  {
+    dispatch(existingUser(token));
+    navigate("/")
+  }
+  if(user)
+  {
+    navigate("/")
+  }
+  
   const loginHandler = (e) => {
     e.preventDefault();
     if (!email || !password) {
-      alert("Please fill all the fields");
+      
     } else {
       let userData = { email, password };
+      dispatch(login(userData));
       
     }
   };

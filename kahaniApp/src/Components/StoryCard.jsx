@@ -9,7 +9,7 @@ const StoryCard = ({ story }) => {
 	const [showAddLineModal, setShowAddLineModal] = useState(false);
 
 	const handleReadStory = () => {
-    console.log("handle read:",story)
+    //console.log("handle read:",story)
 		setShowReadModal(true);
 	};
 
@@ -29,7 +29,7 @@ const StoryCard = ({ story }) => {
 			<h3 className="text-xl mb-2 text-primary dark:text-secondary">
 				{story.title}
 			</h3>
-			<p className="text-gray-700 dark:text-gray-300 mb-4">{story.firstLine}</p>
+			<p className="text-gray-700 dark:text-gray-300 mb-4">{story && story.content.map((el)=>el.text)}</p>
 			<div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity">
 				<button
 					onClick={handleReadStory}

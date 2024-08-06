@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 const Story = ({ story }) => {
   const [sentence, setSentence] = useState('');
-
+  console.log("story",story);
   const handleContribute = async (e) => {
     e.preventDefault();
     console.log(sentence)
