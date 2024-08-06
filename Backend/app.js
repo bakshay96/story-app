@@ -8,10 +8,10 @@ const { responseHandler } = require("./src/Middlewares/reponseHandler");
 const { errorHandler } = require("./src/Middlewares/errorHandler");
 
 const cors=require("cors");
-
 require("dotenv").config();
 const port=process.env.PORT || 8080;
 
+//create express app
 const app=express();
 
 // Middlewares
@@ -21,11 +21,11 @@ app.use(responseHandler);
 
 
 
+// Routes
 app.get("/",async (req,res)=>{
     res.sendFile(__dirname + "/utils/index.html");
 })
 
-// Routes
 app.use('/api/auth', UserRouter);
 app.use('/api/stories', StoryRouter);
 app.use("/api/upload",uploadRoute)

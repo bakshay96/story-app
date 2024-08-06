@@ -7,6 +7,7 @@ const { StoryModel } = require("./story.models");
 
 exports.createStory = async (req, res, next) => {
     const { title, text } = req.body;
+    console.log("title",title,text)
     try {
         const story = await StoryModel.create({
             title,
@@ -14,6 +15,7 @@ exports.createStory = async (req, res, next) => {
             createdBy: req.user._id,
             contributors: [req.user._id]
         });
+        console.log("new story",story);
         res.status(201).json({message:"Story created successfully",story});
     } catch (error) {
         next(error);
@@ -60,6 +62,7 @@ exports.addContribution = async (req, res, next) => {
     const { text } = req.body;
     try {
         const story = await StoryModel.findById(req.params.id);
+       
         if (!story) {
             return statusMiddleware(404, 'Story not found')(req, res, next);
         }
@@ -72,6 +75,26 @@ exports.addContribution = async (req, res, next) => {
         
         res.status(201).success({"Title":story.title,"contributed story ":story},"Successfully contribution done");
         // res.json(story);
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+exports.deleteStoryById = async (req, res, next) => {
+    try {
+        
+        const {id} =req.params;
+        const deleted=await StoryModel.findByIdAndDelete(id);
+       // console.log("deleted",deleted)
+        // if (!story) {
+        //     return statusMiddleware(404, 'Story not found')(req, res, next);
+        // }
+        
+
+        res.status(201).success({deleted},"Successfully Deleted");
+        // res.json({"story":story})
+        
     } catch (error) {
         next(error);
     }
